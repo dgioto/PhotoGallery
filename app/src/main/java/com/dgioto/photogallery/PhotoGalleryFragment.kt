@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dgioto.photogallery.api.FlickrApi
 import retrofit2.Retrofit
+import retrofit2.converter.scalars.ScalarsConverterFactory
 
 class PhotoGalleryFragment : Fragment() {
 
@@ -20,6 +21,7 @@ class PhotoGalleryFragment : Fragment() {
         //Использование объекта Retrofit для создания экземпляра API
         val retrofit : Retrofit = Retrofit.Builder()
             .baseUrl("https://www.flickr.com/")
+            .addConverterFactory(ScalarsConverterFactory.create())
             .build()
 
         val flickrApi: FlickrApi = retrofit.create(FlickrApi::class.java)
