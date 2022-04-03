@@ -1,6 +1,7 @@
 package com.dgioto.photogallery
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -8,8 +9,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dgioto.photogallery.api.FlickrApi
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
+
+private const val TAG = "PhotoGalleryFragment"
 
 class PhotoGalleryFragment : Fragment() {
 
@@ -25,6 +31,20 @@ class PhotoGalleryFragment : Fragment() {
             .build()
 
         val flickrApi: FlickrApi = retrofit.create(FlickrApi::class.java)
+
+        //Получение объекта Call, выполняющего запрос
+        val flickrHomePageRequest: Call<String> = flickrApi.fetchContents()
+
+        //Выполнение асинхронного запроса
+        flickrHomePageRequest.enqueue(object : Callback<String>{
+            override fun onFailure(call: Call<String>, t: Throwable) {
+                Log.e(TAG, "Failed to fetch photos", t)
+            }
+
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+                Log.d(TAG, "Response received: ${response.body()}")
+            }
+        })
     }
 
     override fun onCreateView(
