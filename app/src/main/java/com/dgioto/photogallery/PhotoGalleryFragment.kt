@@ -6,6 +6,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dgioto.photogallery.api.FlickrApi
@@ -24,26 +26,13 @@ class PhotoGalleryFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //Использование объекта Retrofit для создания экземпляра API
-        val retrofit : Retrofit = Retrofit.Builder()
-            .baseUrl("https://www.flickr.com/")
-            .addConverterFactory(ScalarsConverterFactory.create())
-            .build()
-
-        val flickrApi: FlickrApi = retrofit.create(FlickrApi::class.java)
-
-        //Получение объекта Call, выполняющего запрос
-        val flickrHomePageRequest: Call<String> = flickrApi.fetchContents()
-
-        //Выполнение асинхронного запроса
-        flickrHomePageRequest.enqueue(object : Callback<String>{
-            override fun onFailure(call: Call<String>, t: Throwable) {
-                Log.e(TAG, "Failed to fetch photos", t)
-            }
-
-            override fun onResponse(call: Call<String>, response: Response<String>) {
-                Log.d(TAG, "Response received: ${response.body()}")
-            }
+        //Использование FlickrFetchr в PhotoGalleryFragment
+        val flickrLivaData: LiveData<String> = FlickrFetchr().fetchContents()
+        flickrLivaData.observe(
+            this,
+        Observer {
+            responseString ->
+            Log.d(TAG, "Response received: $responseString")
         })
     }
 
