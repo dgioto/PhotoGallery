@@ -19,19 +19,18 @@ class FlickrFetchr {
     init {
         //Использование объекта Retrofit для создания экземпляра API
         val retrofit : Retrofit = Retrofit.Builder()
-            .baseUrl("https://www.flickr.com/")
+            .baseUrl("https://api.flickr.com/")
             .addConverterFactory(ScalarsConverterFactory.create())
             .build()
 
         flickrApi = retrofit.create(FlickrApi::class.java)
     }
 
-    fun fetchContents(): LiveData<String>{
+    fun fetchPhotos(): LiveData<String>{
 
         val responseLiveData: MutableLiveData<String> = MutableLiveData()
         //Получение объекта Call, выполняющего запрос
-        val flickrRequest: Call<String> = flickrApi.fetchContents()
-
+        val flickrRequest: Call<String> = flickrApi.fetchPhotos()
         //Выполнение асинхронного запроса
         flickrRequest.enqueue(object : Callback<String> {
 

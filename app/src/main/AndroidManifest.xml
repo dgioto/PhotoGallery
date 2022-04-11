@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.dgioto.photogallery">
 
+    <!-- flickr.com/services/api
+        Key: 196e83b2dd4a8902c960580c3d20dd9e
+        Secret: 0e2f49ecdeb8ed0e -->
+
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
