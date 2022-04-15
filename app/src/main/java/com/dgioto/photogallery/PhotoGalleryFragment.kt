@@ -27,12 +27,12 @@ class PhotoGalleryFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         //Использование FlickrFetchr в PhotoGalleryFragment
-        val flickrLivaData: LiveData<String> = FlickrFetchr().fetchPhotos()
+        val flickrLivaData: LiveData<List<GalleryItem>> = FlickrFetchr().fetchPhotos()
         flickrLivaData.observe(
             this,
         Observer {
-            responseString ->
-            Log.d(TAG, "Response received: $responseString")
+            galleryItems ->
+            Log.d(TAG, "Response received: $galleryItems")
         })
     }
 
