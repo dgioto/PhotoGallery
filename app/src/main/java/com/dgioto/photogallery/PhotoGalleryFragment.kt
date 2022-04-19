@@ -1,17 +1,16 @@
 package com.dgioto.photogallery
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-private const val TAG = "PhotoGalleryFragment"
 
 class PhotoGalleryFragment : Fragment() {
 
@@ -48,9 +47,32 @@ class PhotoGalleryFragment : Fragment() {
         photoGalleryViewModel.galleryItemLiveData.observe(
             viewLifecycleOwner,
             Observer { galleryItems ->
-                Log.d(TAG, "Have gallery items from ViewModel $galleryItems")
+                photoRecyclerView.adapter = PhotoAdapter(galleryItems)
             }
         )
+    }
+
+    private class PhotoHolder(itemTextView: TextView)
+        : RecyclerView.ViewHolder(itemTextView){
+
+            val bindTitle: (CharSequence) -> Unit = itemTextView::setText
+        }
+
+    private class PhotoAdapter(private val galleryItems: List<GalleryItem>)
+        : RecyclerView.Adapter<PhotoHolder>(){
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoHolder {
+            val textView = TextView(parent.context)
+            return PhotoHolder(textView)
+        }
+
+        override fun onBindViewHolder(holder: PhotoHolder, position: Int) {
+            val galleryItem = galleryItems[position]
+            holder.bindTitle(galleryItem.title)
+        }
+
+        override fun getItemCount(): Int = galleryItems.size
+
     }
 
     companion object {
