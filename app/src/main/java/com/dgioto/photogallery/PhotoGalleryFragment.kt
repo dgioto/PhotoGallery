@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dgioto.photogallery.api.FlickrApi
@@ -21,19 +22,15 @@ private const val TAG = "PhotoGalleryFragment"
 
 class PhotoGalleryFragment : Fragment() {
 
+    private lateinit var photoGalleryViewModel: PhotoGalleryViewModel
     private lateinit var photoRecyclerView: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //Использование FlickrFetchr в PhotoGalleryFragment
-        val flickrLivaData: LiveData<List<GalleryItem>> = FlickrFetchr().fetchPhotos()
-        flickrLivaData.observe(
-            this,
-        Observer {
-            galleryItems ->
-            Log.d(TAG, "Response received: $galleryItems")
-        })
+        //Получение экземпляра ViewModel от провайдера
+        photoGalleryViewModel =
+            ViewModelProvider(this).get(PhotoGalleryViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -49,6 +46,18 @@ class PhotoGalleryFragment : Fragment() {
         photoRecyclerView = view.findViewById(R.id.photo_recycler_view)
         photoRecyclerView.layoutManager = GridLayoutManager(context, 3)
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        //Наблюдение за живыми данными ViewModel
+        photoGalleryViewModel.galleryItemLiveData.observe(
+            viewLifecycleOwner,
+            Observer { galleryItems ->
+                Log.d(TAG, "Have gallery items from ViewModel $galleryItems")
+            }
+        )
     }
 
     companion object {
