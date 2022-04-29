@@ -1,11 +1,15 @@
 package com.dgioto.photogallery
 
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
@@ -52,23 +56,31 @@ class PhotoGalleryFragment : Fragment() {
         )
     }
 
-    private class PhotoHolder(itemTextView: TextView)
-        : RecyclerView.ViewHolder(itemTextView){
+    private class PhotoHolder(itemImageView: ImageView)
+        : RecyclerView.ViewHolder(itemImageView){
 
-            val bindTitle: (CharSequence) -> Unit = itemTextView::setText
+            val bindDrawable: (Drawable) -> Unit = itemImageView::setImageDrawable
         }
 
-    private class PhotoAdapter(private val galleryItems: List<GalleryItem>)
+    private inner class PhotoAdapter(private val galleryItems: List<GalleryItem>)
         : RecyclerView.Adapter<PhotoHolder>(){
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoHolder {
-            val textView = TextView(parent.context)
-            return PhotoHolder(textView)
+            val view = layoutInflater.inflate(
+                R.layout.list_item_gallery,
+                parent,
+                false
+            ) as ImageView
+            return PhotoHolder(view)
         }
 
         override fun onBindViewHolder(holder: PhotoHolder, position: Int) {
             val galleryItem = galleryItems[position]
-            holder.bindTitle(galleryItem.title)
+            val placeholder: Drawable = ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.ic_baseline_public_24
+            ) ?: ColorDrawable()
+            holder.bindDrawable(placeholder)
         }
 
         override fun getItemCount(): Int = galleryItems.size
