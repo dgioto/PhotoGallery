@@ -95,6 +95,9 @@ class PhotoGalleryFragment : Fragment() {
                 R.drawable.ic_baseline_public_24
             ) ?: ColorDrawable()
             holder.bindDrawable(placeholder)
+
+            //Подключение ThumbnailDownloader
+            thumbnailDownloader.queueThumbnail(holder, galleryItem.url)
         }
 
         override fun getItemCount(): Int = galleryItems.size
