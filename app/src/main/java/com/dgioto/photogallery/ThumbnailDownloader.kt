@@ -17,7 +17,38 @@ private const val  MESSAGE_DOWNLOAD = 0
 class ThumbnailDownloader<in T>(
     private val responseHandler: Handler,
     private val onThumbnailDownloader: (T, Bitmap) -> Unit
-) : HandlerThread(TAG), LifecycleObserver {
+) : HandlerThread(TAG) {
+
+    //Рефакторинг наблюдателя за жизненным циклом фрагмента
+    val fragmentLifecycleObserver: LifecycleObserver =
+        object  : LifecycleObserver {
+            //Связь ThumbnailDownloader с жизненным циклом
+            @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+            fun setup(){
+                Log.i(TAG, "Starting background thread")
+                //Запуск потока ThumbnailDownloader
+                start()
+                looper
+            }
+
+            @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+            fun tearDown(){
+                Log.i(TAG, "Destroying background thread")
+                //остановка потока ThumbnailDownloader
+                quit()
+            }
+        }
+
+    //Добавление наблюдателя жизненного цикла представления
+    val viewLifecycleObserver: LifecycleObserver =
+        object  : LifecycleObserver{
+            @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+            fun clearQueue() {
+                Log.i(TAG, "Clearing all requests from queue")
+                requestHandler.removeMessages(MESSAGE_DOWNLOAD)
+                requestMap.clear()
+            }
+        }
 
     private var hasQuit = false
     private lateinit var requestHandler: Handler
@@ -54,22 +85,6 @@ class ThumbnailDownloader<in T>(
     override fun quit(): Boolean {
         hasQuit = true
         return super.quit()
-    }
-
-    //Связь ThumbnailDownloader с жизненным циклом
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun setup(){
-        Log.i(TAG, "Starting background thread")
-        //Запуск потока ThumbnailDownloader
-        start()
-        looper
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    fun tearDown(){
-        Log.i(TAG, "Destroying background thread")
-        //остановка потока ThumbnailDownloader
-        quit()
     }
 
     fun queueThumbnail(target: T, url: String){
