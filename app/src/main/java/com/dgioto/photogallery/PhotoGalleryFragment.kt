@@ -1,8 +1,10 @@
 package com.dgioto.photogallery
 
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.os.Handler
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -33,7 +35,13 @@ class PhotoGalleryFragment : Fragment() {
             ViewModelProvider(this).get(PhotoGalleryViewModel::class.java)
 
         //Создание ThumbnailDownloader
-        thumbnailDownloader = ThumbnailDownloader()
+        //Подключение к обработчику ответов
+        val responseHandler = Handler()
+        thumbnailDownloader = ThumbnailDownloader(responseHandler) {
+            photoHolder, bitmap ->
+            val drawable = BitmapDrawable(resources, bitmap)
+            photoHolder.bindDrawable(drawable)
+        }
         lifecycle.addObserver(thumbnailDownloader)
     }
 

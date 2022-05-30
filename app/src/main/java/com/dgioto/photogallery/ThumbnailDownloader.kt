@@ -1,6 +1,7 @@
 package com.dgioto.photogallery
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.Message
@@ -13,7 +14,10 @@ import java.util.concurrent.ConcurrentHashMap
 private const val  TAG = "ThumbnailDownloader"
 private const val  MESSAGE_DOWNLOAD = 0
 
-class ThumbnailDownloader<in T> : HandlerThread(TAG), LifecycleObserver {
+class ThumbnailDownloader<in T>(
+    private val responseHandler: Handler,
+    private val onThumbnailDownloader: (T, Bitmap) -> Unit
+) : HandlerThread(TAG), LifecycleObserver {
 
     private var hasQuit = false
     private lateinit var requestHandler: Handler
@@ -37,6 +41,14 @@ class ThumbnailDownloader<in T> : HandlerThread(TAG), LifecycleObserver {
     private fun handleRequest(target: T) {
         val url = requestMap[target] ?: return
         val bitmap = flickrFetchr.fetchPhoto(url) ?: return
+        //загрузка и вывод изображений
+        responseHandler.post(Runnable {
+            if (requestMap[target] != url || hasQuit) {
+                return@Runnable
+            }
+            requestMap.remove(target)
+            onThumbnailDownloader(target, bitmap)
+        })
     }
 
     override fun quit(): Boolean {
