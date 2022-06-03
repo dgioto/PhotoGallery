@@ -8,7 +8,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.dgioto.photogallery.api.FlickResponse
 import com.dgioto.photogallery.api.FlickrApi
+import com.dgioto.photogallery.api.PhotoInterceptor
 import com.dgioto.photogallery.api.PhotoResponse
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -23,20 +26,38 @@ class FlickrFetchr {
     private val flickrApi : FlickrApi
 
     init {
+
+        //Добавление перехватчика в конфигурацию Retrofit
+        val client = OkHttpClient.Builder()
+            .addInterceptor(PhotoInterceptor())
+            .build()
+
         //Использование объекта Retrofit для создания экземпляра API
         val retrofit : Retrofit = Retrofit.Builder()
             .baseUrl("https://api.flickr.com/")
             .addConverterFactory(GsonConverterFactory.create())
+            .client(client)
             .build()
 
         flickrApi = retrofit.create(FlickrApi::class.java)
     }
 
+    //Добавление функции поиска во FlickrFetchr
     fun fetchPhotos(): LiveData<List<GalleryItem>>{
+        return fetchPhotoMetadata(flickrApi.fetchPhotos())
+    }
+
+    //Добавление функции поиска во FlickrFetchr
+    fun searchPhotos(query: String): LiveData<List<GalleryItem>>{
+        return fetchPhotoMetadata(flickrApi.searchPhotos(query))
+    }
+
+    //Добавление функции поиска во FlickrFetchr
+    private fun fetchPhotoMetadata(flickrRequest: Call<FlickResponse>)
+            : LiveData<List<GalleryItem>>{
 
         val responseLiveData: MutableLiveData<List<GalleryItem>> = MutableLiveData()
-        //Получение объекта Call, выполняющего запрос
-        val flickrRequest: Call<FlickResponse> = flickrApi.fetchPhotos()
+
         //Выполнение асинхронного запроса
         flickrRequest.enqueue(object : Callback<FlickResponse> {
 
