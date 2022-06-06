@@ -5,10 +5,8 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -29,6 +27,9 @@ class PhotoGalleryFragment : Fragment() {
 
         //Сохранение PhotoGalleryFragment
         retainInstance = true
+
+        //Переопределение onCreateOptionsMenu(...)
+        setHasOptionsMenu(true)
 
         //Получение экземпляра ViewModel от провайдера
         photoGalleryViewModel =
@@ -85,6 +86,12 @@ class PhotoGalleryFragment : Fragment() {
         super.onDestroy()
 
         lifecycle.removeObserver(thumbnailDownloader.fragmentLifecycleObserver)
+    }
+
+    //Переопределение onCreateOptionsMenu(...)
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.fragment_photo_gallery, menu)
     }
 
     private class PhotoHolder(itemImageView: ImageView)
