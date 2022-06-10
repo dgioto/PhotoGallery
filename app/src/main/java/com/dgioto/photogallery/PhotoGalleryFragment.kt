@@ -113,6 +113,11 @@ class PhotoGalleryFragment : Fragment() {
                     return false
                 }
             })
+
+            //предварительное заполнение SearchView
+            setOnSearchClickListener {
+                searchView.setQuery(photoGalleryViewModel.searchTerm, false)
+            }
         }
     }
 
