@@ -1,11 +1,10 @@
 package com.dgioto.photogallery
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.*
 
-class PhotoGalleryViewModel: ViewModel() {
+class PhotoGalleryViewModel(private val app: Application): AndroidViewModel(app) {
+
     val galleryItemLiveData: LiveData<List<GalleryItem>>
 
     private val flickrFetchr = FlickrFetchr()
@@ -13,14 +12,20 @@ class PhotoGalleryViewModel: ViewModel() {
 
     init {
         //Хранение последнего запроса в PhotoGalleryViewModel
-        mutableSearchTerm.value = "planets"
-
-        galleryItemLiveData = Transformations.switchMap(mutableSearchTerm) {
-            searchTerm -> flickrFetchr.searchPhotos(searchTerm)
+        mutableSearchTerm.value = QueryPreferences.getStoredQuery(app)
+        galleryItemLiveData = Transformations.switchMap(mutableSearchTerm) { searchTerm ->
+            //Получение интересных фотографий, когда запрос пустой
+            if (searchTerm.isBlank()){
+                flickrFetchr.fetchPhotos()
+            } else {
+                flickrFetchr.searchPhotos(searchTerm)
+            }
         }
     }
 
     fun fetchPhotos(query: String = "") {
+        //Сохранение запроса в общих настройках
+        QueryPreferences.setStoredQuery(app, query)
         mutableSearchTerm.value = query
     }
 }

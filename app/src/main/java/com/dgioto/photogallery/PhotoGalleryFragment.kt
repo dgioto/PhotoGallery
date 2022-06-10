@@ -116,6 +116,17 @@ class PhotoGalleryFragment : Fragment() {
         }
     }
 
+    //Очистка сохраненного запроса
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_item_clear -> {
+                photoGalleryViewModel.fetchPhotos("")
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     private class PhotoHolder(itemImageView: ImageView)
         : RecyclerView.ViewHolder(itemImageView){
 
