@@ -1,5 +1,5 @@
 package com.dgioto.photogallery.api
 
-class FlickResponse {
+class FlickrResponse {
     lateinit var photos: PhotoResponse
 }

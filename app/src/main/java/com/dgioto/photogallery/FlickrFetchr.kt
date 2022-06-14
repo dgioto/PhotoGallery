@@ -6,12 +6,11 @@ import android.util.Log
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.dgioto.photogallery.api.FlickResponse
+import com.dgioto.photogallery.api.FlickrResponse
 import com.dgioto.photogallery.api.FlickrApi
 import com.dgioto.photogallery.api.PhotoInterceptor
 import com.dgioto.photogallery.api.PhotoResponse
 import okhttp3.OkHttpClient
-import okhttp3.Request
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -42,34 +41,43 @@ class FlickrFetchr {
         flickrApi = retrofit.create(FlickrApi::class.java)
     }
 
+    //Предоставление объектов Call
+    fun fetchPhotosRequest(): Call<FlickrResponse> {
+        return flickrApi.fetchPhotos()
+    }
+
     //Добавление функции поиска во FlickrFetchr
     fun fetchPhotos(): LiveData<List<GalleryItem>>{
-        return fetchPhotoMetadata(flickrApi.fetchPhotos())
+        return fetchPhotoMetadata(fetchPhotosRequest())
+    }
+
+    fun searchPhotosRequest(query: String): Call<FlickrResponse> {
+        return flickrApi.searchPhotos(query)
     }
 
     //Добавление функции поиска во FlickrFetchr
     fun searchPhotos(query: String): LiveData<List<GalleryItem>>{
-        return fetchPhotoMetadata(flickrApi.searchPhotos(query))
+        return fetchPhotoMetadata(searchPhotosRequest(query))
     }
 
     //Добавление функции поиска во FlickrFetchr
-    private fun fetchPhotoMetadata(flickrRequest: Call<FlickResponse>)
+    private fun fetchPhotoMetadata(flickrRequest: Call<FlickrResponse>)
             : LiveData<List<GalleryItem>>{
 
         val responseLiveData: MutableLiveData<List<GalleryItem>> = MutableLiveData()
 
         //Выполнение асинхронного запроса
-        flickrRequest.enqueue(object : Callback<FlickResponse> {
+        flickrRequest.enqueue(object : Callback<FlickrResponse> {
 
-            override fun onFailure(call: Call<FlickResponse>, t: Throwable) {
+            override fun onFailure(call: Call<FlickrResponse>, t: Throwable) {
                 Log.e(TAG, "Failed to fetch photos", t)
             }
 
-            override fun onResponse(call: Call<FlickResponse>,
-                                    response: Response<FlickResponse>) {
+            override fun onResponse(call: Call<FlickrResponse>,
+                                    response: Response<FlickrResponse>) {
                 Log.d(TAG, "Response received")
-                val flickResponse: FlickResponse? = response.body()
-                val photoResponse: PhotoResponse? = flickResponse?.photos
+                val flickrResponse: FlickrResponse? = response.body()
+                val photoResponse: PhotoResponse? = flickrResponse?.photos
                 var galleryItems: List<GalleryItem> = photoResponse?.galleryItems?: mutableListOf()
                 galleryItems = galleryItems.filterNot{
                     it.url.isBlank()
