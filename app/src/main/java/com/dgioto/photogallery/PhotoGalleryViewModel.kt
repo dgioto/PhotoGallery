@@ -10,6 +10,10 @@ class PhotoGalleryViewModel(private val app: Application): AndroidViewModel(app)
     private val flickrFetchr = FlickrFetchr()
     private  val mutableSearchTerm = MutableLiveData<String>()
 
+    //Открытие поисковой фразы из PhotoGalleryViewModel
+    val searchTerm: String
+        get() = mutableSearchTerm.value ?: ""
+
     init {
         //Хранение последнего запроса в PhotoGalleryViewModel
         mutableSearchTerm.value = QueryPreferences.getStoredQuery(app)
