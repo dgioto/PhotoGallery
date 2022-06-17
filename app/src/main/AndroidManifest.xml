@@ -33,7 +33,7 @@
         <receiver android:name=".NotificationReceiver"
             android:permission="com.dgioto.photogallery.PRIVATE"
             android:exported="false">
-            <intent-filter>
+            <intent-filter android:priority="-999">
                 <action
                     android:name="com.dgioto.photogallery.SHOW_NOTIFICATION" />
             </intent-filter>
