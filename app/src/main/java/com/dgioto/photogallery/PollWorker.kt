@@ -61,14 +61,15 @@ class PollWorker(private val context: Context, workerParams: WorkerParameters)
             notificationManager.notify(0, notification)
 
             //Отправка широковещательного интента
-            context.sendBroadcast(Intent(ACTION_SHOW_NOTIFICATION))
+            //Отправка с разрешением
+            context.sendBroadcast(Intent(ACTION_SHOW_NOTIFICATION), PERM_PRIVATE)
         }
 
         return Result.success()
     }
 
     companion object {
-        const val ACTION_SHOW_NOTIFICATION =
-            "com.dgioto.photogallery.SHOW_NOTIFICATION"
+        const val ACTION_SHOW_NOTIFICATION = "com.dgioto.photogallery.SHOW_NOTIFICATION"
+        const val PERM_PRIVATE = "com.dgioto.photogallery.PRIVATE"
     }
 }

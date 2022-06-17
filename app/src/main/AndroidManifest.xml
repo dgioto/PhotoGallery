@@ -6,7 +6,10 @@
         Key: 196e83b2dd4a8902c960580c3d20dd9e
         Secret: 0e2f49ecdeb8ed0e -->
 
+    <permission android:name="com.bignerdranch.android.photogallery.PRIVATE"
+        android:protectionLevel="signature" />
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="com.bignerdranch.android.photogallery.PRIVATE" />
 
     <application
         android:name=".PhotoGalleryApplication"
@@ -28,6 +31,7 @@
         </activity>
 
         <receiver android:name=".NotificationReceiver"
+            android:permission="com.dgioto.photogallery.PRIVATE"
             android:exported="false">
             <intent-filter>
                 <action
